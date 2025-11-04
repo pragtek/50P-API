@@ -2,12 +2,13 @@ import graphene
 from graphene_django import DjangoObjectType
 from ad.models import TokenTransactions
 from graphql_jwt.decorators import login_required
+from django.core.exceptions import ValidationError
 
 
 class TokenTransactionsType(DjangoObjectType):
     class Meta:
         model = TokenTransactions
-        fields = ("module_code", "unique_id", "status", "tokens")
+        fields = ("id", "module_code", "unique_id", "status", "tokens")
 
 class TokenTransactionsDataModelType(graphene.ObjectType):
     total_rows = graphene.Int()
@@ -45,10 +46,40 @@ class CreateTransaction(graphene.Mutation):
 
         return CreateTransaction(transaction = new_transaction)
 
+class UpdateTransaction(graphene.Mutation):
+    class Arguments:
+        id = graphene.Int(required = True)
+        module_code = graphene.String()
+        status = graphene.String()
+        tokens = graphene.Int()
+    
+    transaction = graphene.Field(TokenTransactionsType)
+
+    @login_required
+    def mutate(self, info, id, **kwargs):
+        try:
+            item = TokenTransactions.objects.get(pk = id, user = info.context.user)
+        except TokenTransactions.DoesNotExist:
+            raise ValidationError("Transaction does not exists.")
+        
+        item.module_code = kwargs.get("module_code")
+        item.status = kwargs.get("status")
+        item.tokens = kwargs.get("tokens")
+        item.save(
+            update_fields = [
+            "module_code",
+            "status",
+            "tokens"
+            ]
+        )
+        return UpdateTransaction(transaction = item)
+
+
 
 
 class Mutation(graphene.ObjectType):
     add_transaction = CreateTransaction.Field()
+    update_transaction = UpdateTransaction.Field()
 
 
 transactions_schema = graphene.Schema(query = Query, mutation = Mutation)
