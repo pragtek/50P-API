@@ -75,11 +75,28 @@ class UpdateTransaction(graphene.Mutation):
         return UpdateTransaction(transaction = item)
 
 
+class DeleteTransaction(graphene.Mutation):
+    class Arguments:
+        id = graphene.Int(required = True)
+    
+    ok = graphene.Boolean()
 
+    @login_required
+    def mutate(self, info, id):
+        try:
+            item = TokenTransactions.objects.get(pk = id, user = info.context.user)
+        
+        except TokenTransactions.DoesNotExist:
+            raise ValidationError("Transaction does not exist.")
+
+        item.is_deleted = True
+        item.save(update_fields=["is_deleted"])
+        return DeleteTransaction(ok = True)
 
 class Mutation(graphene.ObjectType):
     add_transaction = CreateTransaction.Field()
     update_transaction = UpdateTransaction.Field()
+    delete_transaction = DeleteTransaction.Field()
 
 
 transactions_schema = graphene.Schema(query = Query, mutation = Mutation)
