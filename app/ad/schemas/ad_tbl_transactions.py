@@ -3,7 +3,7 @@ from graphene_django import DjangoObjectType
 from ad.models import TokenTransactions
 from graphql_jwt.decorators import login_required
 from django.core.exceptions import ValidationError
-
+from django.db.models import Q
 
 class TokenTransactionsType(DjangoObjectType):
     class Meta:
@@ -17,14 +17,45 @@ class TokenTransactionsDataModelType(graphene.ObjectType):
 
     
 class Query(graphene.ObjectType):
-    all_tokens_transactions = graphene.Field(TokenTransactionsDataModelType)
+    all_tokens_transactions_by_id = graphene.Field(TokenTransactionsType, id = graphene.Int())
+
+    all_tokens_transactions = graphene.Field(
+        TokenTransactionsDataModelType,
+        first = graphene.Int(),
+        search = graphene.String(),
+        skip = graphene.Int(),
+    )
+
+
+
     
-    def resolve_all_tokens_transactions(self,info):
-        all_transactions = TokenTransactions.objects.all()
+    def resolve_all_tokens_transactions(self, info, **kwargs):
+        first = kwargs.get("first")
+        search = kwargs.get("search")
+        skip = kwargs.get("skip")
+
+        filter = Q()
+
+        if search:
+            filter =  Q(module_code__icontains = search)
+        
+        all_transactions = TokenTransactions.objects.filter(filter)
+        all_transactions = all_transactions.order_by("-created_date")
+        totalCount = all_transactions.count()
+
+        if skip:
+            all_transactions = all_transactions[skip:]
+
+        if first:
+            all_transactions = all_transactions[:first] 
+
         return TokenTransactionsDataModelType(
-            total_rows = all_transactions.count(),
+            total_rows = totalCount,
             rows = all_transactions
             )
+
+    def resolve_all_tokens_transactions_by_id(self, info, id):
+        return TokenTransactions.objects.get(pk = id)
 
 class CreateTransaction(graphene.Mutation):
     class Arguments:
