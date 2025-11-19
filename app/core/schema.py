@@ -66,8 +66,10 @@ import ad.schemas.referral as referral
 import ad.schemas.chat_keywords as chat_keywords
 import ad.schemas.clinic as clinic
 import ad.schemas.ad_tbl_transactions as transactions
+import ad.schemas.Subscription as subscription
 
 class Query(
+            subscription.subscription_schema.Query,
             transactions.transactions_schema.Query,
             entity_type.schema_entity_type.Query,
             calendar.schema_calendar.Query,
@@ -134,6 +136,7 @@ class Query(
     pass
 
 class Mutation(
+                subscription.subscription_schema.Mutation,
                transactions.transactions_schema.Mutation,
                calendar.schema_calendar.Mutation,
                user.schema_user.Mutation,
