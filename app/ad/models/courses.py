@@ -1,7 +1,6 @@
 from core.base import BaseModelV2
 from django.db import models
 import uuid
-from django.utils.translation import gettext_lazy as _
 import datetime
 from .teachers import Teacher
 
@@ -22,11 +21,8 @@ class Course(BaseModelV2):
     LEVEL = [
         ('beginner', 'Beginner'),
         ('intermediate', 'Intermediate'),
-        ('advance', 'Advance')
-
-    ]
-
-        
+        ('advance', 'Advance'),
+    ] 
 
     level = models.CharField(
         max_length=50,
