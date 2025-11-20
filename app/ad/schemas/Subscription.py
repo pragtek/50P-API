@@ -122,7 +122,7 @@ class UpdateSubscription(graphene.Mutation):
            item = Subscription.objects.get(subscription_id=subscription_id)
        except Subscription.DoesNotExist:
             raise ValidationError("Subscription with the given ID does not exist.")
-       
+    #    hello
       
 
        user_id = kwargs.get("user_id")
