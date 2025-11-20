@@ -28,3 +28,4 @@ from .chat_keyword import ChatKeyword
 from .specialization_category import SpecializationCategory, MedicalTypes
 from .clinic import Clinic
 from .ad_tbl_transactions import TokenTransactions
+from .Subscription import Subscription
