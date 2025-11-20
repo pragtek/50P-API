@@ -30,3 +30,4 @@ from .clinic import Clinic
 from .ad_tbl_transactions import TokenTransactions
 from .courses import Course
 from .teachers import Teacher
+from .Subscription import Subscription
