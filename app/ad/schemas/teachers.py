@@ -7,7 +7,7 @@ from django.db.models import Q
 class TeacherType(DjangoObjectType):
     class Meta:
         model = Teacher
-        fields = (
+        fields = ( 
             "id",
             "unique_id",
             "first_name",
@@ -20,6 +20,7 @@ class TeacherType(DjangoObjectType):
 class TeacherDataModelType(graphene.ObjectType):
     total_rows = graphene.Int()
     rows = graphene.List(TeacherType)
+    
 
 class Query(graphene.ObjectType):
     all_teachers_by_id = graphene.Field(TeacherType, id = graphene.Int())
@@ -41,8 +42,7 @@ class Query(graphene.ObjectType):
         filter = Q()
 
         if search:
-            filter = Q(unique_id__icontains = search)
-        
+            filter = Q(unique_id__icontains = search)      
         all_teachers = Teacher.objects.filter(filter)
         all_teachers = all_teachers.order_by("-created_date")
         totalCount = all_teachers.count()
