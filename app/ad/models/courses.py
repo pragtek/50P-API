@@ -3,6 +3,7 @@ from django.db import models
 import uuid
 import datetime
 from .teachers import Teacher
+#wdsa
 
 class Course(BaseModelV2):
     course_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
