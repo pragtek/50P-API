@@ -7,7 +7,7 @@ from django.db.models import Q
 from authtf.models.user import User
 from django.core.exceptions import ObjectDoesNotExist
 from ad.models.ad_tbl_transactions import TokenTransactions
-# from ad.models.courses import Course
+from ad.models.courses import Course
 
 class SubscriptionType(DjangoObjectType):
     class Meta:
@@ -15,7 +15,7 @@ class SubscriptionType(DjangoObjectType):
         fields = (
             "subscription_id",
             "user",
-            # "course",
+            "course",
             "subscription_type",
             "is_active",
             "price",
@@ -67,12 +67,12 @@ class Query(graphene.ObjectType):
 class CreateSubscription(graphene.Mutation):
     class Arguments:
         user_id = graphene.Int(required=True)
-        # course_id =  graphene.Int(required=True)
+        course_id =  graphene.Int(required=True)
         subscription_type = graphene.String(required=True)
         is_active = graphene.Boolean(required=True)
         price = graphene.Float(required=True)
         payment_status = graphene.String(required=True)
-        transaction_id = graphene.String(required=True)
+        transaction_id = graphene.Int(required=True)
     
     subscription = graphene.Field(SubscriptionType)
 
@@ -88,12 +88,17 @@ class CreateSubscription(graphene.Mutation):
             transaction_instance = TokenTransactions.objects.get(id=kwargs.get("transaction_id"))
         except ObjectDoesNotExist:
             raise ValidationError("Transaction with the given ID does not exist.")
-
-        # course = Course.objects.get(id=kwargs.get("course_id"))
+        
+        course_instance = None
+        try:
+            course_instance = Course.objects.get(id=kwargs.get("course_id"))
+        except ObjectDoesNotExist:
+            raise ValidationError("Course with the given ID does not exist.")
+       
 
         new_subscription = Subscription.objects.create(
             user = user_instance,
-            # course = course,
+            course = course_instance,
             subscription_type = kwargs.get("subscription_type"),
             is_active = kwargs.get("is_active", False),
             price = kwargs.get("price"),
@@ -107,12 +112,12 @@ class UpdateSubscription(graphene.Mutation):
     class Arguments:
         subscription_id = graphene.Int(required=True)
         user_id = graphene.Int()
-        # course_id = graphene.Int()
+        course_id = graphene.Int()
         subscription_type = graphene.String()
         is_active = graphene.Boolean()
         price = graphene.Float()
         payment_status = graphene.String()
-        transaction_id = graphene.String()
+        transaction_id = graphene.Int()
 
     subscription = graphene.Field(SubscriptionType)
 
@@ -128,6 +133,7 @@ class UpdateSubscription(graphene.Mutation):
 
        user_id = kwargs.get("user_id")
        transaction_id = kwargs.get("transaction_id")
+       course_id = kwargs.get("course_id")
        if transaction_id is not None:
            try:
             transaction_instance = TokenTransactions.objects.get(id=transaction_id)
@@ -142,9 +148,13 @@ class UpdateSubscription(graphene.Mutation):
            except ObjectDoesNotExist:
                 raise ValidationError("User with the given ID does not exist.")
           
-    #    if "course_id" in kwargs:
-    #           item.course = Course.objects.get(id=kwargs["course_id"])
-    #           update_filelds.append("course")
+       if course_id is not None:
+              try:
+                 course_instance = Course.objects.get(id=course_id)
+                 item.course = course_instance
+              except ObjectDoesNotExist:
+                 raise ValidationError("Course with the given ID does not exist.")
+             
        if "subscription_type" in kwargs:
            item.subscription_type = kwargs["subscription_type"]
           

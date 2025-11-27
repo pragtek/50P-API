@@ -65,14 +65,13 @@ class CreateTransaction(graphene.Mutation):
     
     transaction = graphene.Field(TokenTransactionsType)
 
-    @login_required
     def mutate(self, info, **kwargs):
-        session_user = info.context.user
+        
         new_transaction = TokenTransactions.objects.create(
             module_code = kwargs.get("module_code"),
             status = kwargs.get("status"),
             tokens = kwargs.get("tokens"),
-            user = session_user
+            
         )
 
         return CreateTransaction(transaction = new_transaction)
@@ -86,10 +85,9 @@ class UpdateTransaction(graphene.Mutation):
     
     transaction = graphene.Field(TokenTransactionsType)
 
-    @login_required
     def mutate(self, info, id, **kwargs):
         try:
-            item = TokenTransactions.objects.get(pk = id, user = info.context.user)
+            item = TokenTransactions.objects.get(pk = id)
         except TokenTransactions.DoesNotExist:
             raise ValidationError("Transaction does not exists.")
         
@@ -112,10 +110,9 @@ class DeleteTransaction(graphene.Mutation):
     
     ok = graphene.Boolean()
 
-    @login_required
     def mutate(self, info, id):
         try:
-            item = TokenTransactions.objects.get(pk = id, user = info.context.user)
+            item = TokenTransactions.objects.get(pk = id)
         
         except TokenTransactions.DoesNotExist:
             raise ValidationError("Transaction does not exist.")
