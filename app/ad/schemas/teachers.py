@@ -58,7 +58,7 @@ class Query(graphene.ObjectType):
             rows = all_teachers
         )
     
-class CreateTeacher(graphene.Mutation):#q
+class CreateTeacher(graphene.Mutation):#qqq
     class Arguments:
         first_name = graphene.String(required=True)
         last_name = graphene.String(required=True)

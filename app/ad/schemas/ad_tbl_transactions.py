@@ -4,7 +4,7 @@ from ad.models import TokenTransactions
 from graphql_jwt.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-
+#a
 class TokenTransactionsType(DjangoObjectType):
     class Meta:
         model = TokenTransactions
