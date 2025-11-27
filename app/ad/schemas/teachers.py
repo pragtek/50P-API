@@ -42,7 +42,7 @@ class Query(graphene.ObjectType):
         filter = Q()
 
         if search:
-            filter = Q(unique_id__icontains = search)      
+            filter = Q(first_name__icontains = search)      
         all_teachers = Teacher.objects.filter(filter)
         all_teachers = all_teachers.order_by("-created_date")
         totalCount = all_teachers.count()
