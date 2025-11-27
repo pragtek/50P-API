@@ -70,7 +70,7 @@ class CreateSubscription(graphene.Mutation):
         course_id =  graphene.Int(required=True)
         subscription_type = graphene.String(required=True)
         is_active = graphene.Boolean(required=True)
-        price = graphene.Float(required=True)
+        price = graphene.Int(required=True)
         payment_status = graphene.String(required=True)
         transaction_id = graphene.Int(required=True)
     
@@ -106,7 +106,7 @@ class CreateSubscription(graphene.Mutation):
             transaction_id = transaction_instance,
         )
 
-        return Query.CreateSubscription(subscription=new_subscription)
+        return CreateSubscription(subscription=new_subscription)
     
 class UpdateSubscription(graphene.Mutation):
     class Arguments:
@@ -115,7 +115,7 @@ class UpdateSubscription(graphene.Mutation):
         course_id = graphene.Int()
         subscription_type = graphene.String()
         is_active = graphene.Boolean()
-        price = graphene.Float()
+        price = graphene.Int()
         payment_status = graphene.String()
         transaction_id = graphene.Int()
 
