@@ -53,4 +53,4 @@ class Query(graphene.ObjectType):
         except Job.DoesNotExist:
             return None
 
-job_list_schema = graphene.Schema(query=Query)
+job_list_schema = graphene.Schema(query=Query) 

@@ -73,7 +73,7 @@ import ad.schemas.job as job
 import ad.schemas.job_list as job_list
 
 class Query(
-            job_list.job_list_schema.Query,
+            job_list.job_list_schema.Query, 
                 job.job_schema.Query,
             subscription.subscription_schema.Query,
             courses.courses_schema.Query,
