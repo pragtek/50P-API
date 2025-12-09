@@ -75,6 +75,11 @@ import ad.schemas.job_list as job_list
 class Query(
             job_list.job_list_schema.Query, 
                 job.job_schema.Query,
+import ad.schemas.list_course as list_course
+
+class Query(
+            list_course.list_course_schema.Query,
+            job.job_schema.Query,
             subscription.subscription_schema.Query,
             courses.courses_schema.Query,
             teachers.teachers_schema.Query,
