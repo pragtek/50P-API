@@ -6,7 +6,7 @@ from django.db.models import Q
 class JobListType(DjangoObjectType):
     class Meta:
         model = Job
-        fields = ("job_id","job_title")
+        fields = ("job_id","job_title", "description", "qualification", "location", "salary", "employment_type", "category", "experience")
 
 class JobListDataModelType(graphene.ObjectType):
     total_rows = graphene.Int()
