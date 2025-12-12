@@ -1,7 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from ad.models import Subscription
-from django.db import Q
+from django.db.models import Q
 
 class SubscriptionType(DjangoObjectType):
     class Meta:
@@ -39,7 +39,7 @@ class Query(graphene.ObjectType):
         if search:
             filter = Q(user__icontains = search)
         
-        list_subscription = Subscription.objects.get(filter)
+        list_subscription = Subscription.objects.filter(filter)
         total_rows = list_subscription.count()
         list_subscription = list_subscription.order_by('-created_date')
 
