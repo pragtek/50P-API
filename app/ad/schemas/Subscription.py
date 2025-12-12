@@ -70,7 +70,7 @@ class CreateSubscription(graphene.Mutation):
         course_id =  graphene.Int(required=True)
         subscription_type = graphene.String(required=True)
         is_active = graphene.Boolean(required=True)
-        price = graphene.Int(required=True)
+        price = graphene.String(required=True)
         payment_status = graphene.String(required=True)
         transaction_id = graphene.Int(required=True)
     
