@@ -78,6 +78,7 @@ import ad.schemas.list_subscription as list_susbscription
 
 class Query(
             list_susbscription.list_subscription_schema.Query,
+           job_list.job_list_schema.Query,
             list_course.list_course_schema.Query,
             job_list.job_list_schema.Query,
             job.job_schema.Query,
