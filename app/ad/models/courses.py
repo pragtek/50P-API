@@ -3,6 +3,7 @@ from django.db import models
 import uuid
 import datetime
 from .teachers import Teacher
+from django.conf import settings
 #wdsa
 
 class Course(BaseModelV2):
@@ -30,7 +31,15 @@ class Course(BaseModelV2):
         choices=LEVEL,
         default="beginner"
 
-    )    
+    )   
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null = True,
+        blank = True,
+        on_delete=models.CASCADE,
+        related_name="courses"
+
+    ) 
     
     class Meta:
         verbose_name = "Course"
