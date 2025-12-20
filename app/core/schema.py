@@ -151,6 +151,7 @@ class Query(
 
 class Mutation(
                 list_course.list_course_schema.Mutation,
+                job_list.job_list_schema.Mutation,
                 subscription.subscription_schema.Mutation,
                 job.job_schema.Mutation,
                 courses.courses_schema.Mutation,
