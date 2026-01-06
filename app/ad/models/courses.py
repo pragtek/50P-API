@@ -32,14 +32,11 @@ class Course(BaseModelV2):
         default="beginner"
 
     )   
-    user = models.ForeignKey(
+    applicants = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        null = True,
-        blank = True,
-        on_delete=models.CASCADE,
-        related_name="courses"
-
-    ) 
+        blank=True,
+        related_name="enrolled_courses" 
+    )
     
     class Meta:
         verbose_name = "Course"
