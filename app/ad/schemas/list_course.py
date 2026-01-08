@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import timedelta
 from graphql import GraphQLError
-from ad.models import Course, Teacher
+from ad.models import Course
 from authtf.models.user import User
 
 
@@ -65,7 +65,7 @@ class Query(graphene.ObjectType):
         first = kwargs.get("first")
         skip = kwargs.get("skip")
 
-        qs = Course.objects.all().order_by("-id") # Update ordering field if needed
+        qs = Course.objects.all().order_by("-id") 
 
         if search:
             qs = qs.filter(Q(course_name__icontains=search) | Q(level__icontains=search))

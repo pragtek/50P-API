@@ -2,13 +2,14 @@ import graphene
 from graphene_django import DjangoObjectType
 from ad.models import TokenTransactions
 from graphql_jwt.decorators import login_required
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import Q
-#a
+from authtf.models.user import User
+
 class TokenTransactionsType(DjangoObjectType):
     class Meta:
         model = TokenTransactions
-        fields = ("id", "module_code", "unique_id", "status", "tokens")
+        fields = ("id", "module_code", "unique_id", "status", "tokens", "user")
 
 class TokenTransactionsDataModelType(graphene.ObjectType):
     total_rows = graphene.Int()
@@ -120,11 +121,39 @@ class DeleteTransaction(graphene.Mutation):
         item.is_deleted = True
         item.save(update_fields=["is_deleted"])
         return DeleteTransaction(ok = True)
+    
+class DoTransaction(graphene.Mutation):
+    class Arguments:
+        user_id = graphene.Int(required = True)
+        tokens = graphene.Int(required=True)
+        module_code = graphene.String(required=True)
+    
+    success = graphene.Boolean()
+    message = graphene.String()
+    transaction = graphene.Field(TokenTransactionsType)
+
+    def mutate(self, info, user_id, tokens, module_code):
+        try:
+            user_obj = User.objects.get(pk=user_id)
+            txn = TokenTransactions.objects.create(
+                tokens = tokens,
+                module_code = module_code,
+                user = user_obj
+            )
+            return DoTransaction(success=True, message="Transaction successful.", transaction = txn)
+        except User.DoesNotExist:
+            return  DoTransaction(success = False, message = f"User with ID {user_id} not found.")
+        
+        except Exception as e:
+            return DoTransaction(success=False, message=str(e))
+        
 
 class Mutation(graphene.ObjectType):
     add_transaction = CreateTransaction.Field()
     update_transaction = UpdateTransaction.Field()
     delete_transaction = DeleteTransaction.Field()
+    do_transaction = DoTransaction.Field()
+
 
 
 transactions_schema = graphene.Schema(query = Query, mutation = Mutation)
