@@ -33,5 +33,6 @@ from .teachers import Teacher
 from .Subscription import Subscription
 from .job import Job
 from .test_job import TestJob
+from .site_content import SiteContent
 #ABCD
 

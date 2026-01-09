@@ -73,10 +73,12 @@ import ad.schemas.job as job
 import ad.schemas.job_list as job_list
 import ad.schemas.list_course as list_course
 import ad.schemas.list_subscription as list_susbscription
+import ad.schemas.site_content as site_content
 
 
 
 class Query(
+            site_content.site_content_schema.Query,
             list_susbscription.list_subscription_schema.Query,
             list_course.list_course_schema.Query,
             job_list.job_list_schema.Query,
@@ -150,6 +152,7 @@ class Query(
     pass
 
 class Mutation(
+                site_content.site_content_schema.Mutation,
                 list_course.list_course_schema.Mutation,
                 job_list.job_list_schema.Mutation,
                 subscription.subscription_schema.Mutation,
