@@ -4,14 +4,12 @@ from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import timedelta
 from graphql import GraphQLError
-from ad.models import Course, CourseChapter
+from ad.models import Course, Teacher
 from authtf.models.user import User
+from ad.schemas.course_chapter import CourseChapterType
+import datetime
 
 
-class CourseChapterType(DjangoObjectType):
-    class Meta:
-        model = CourseChapter
-        fields = ('id', 'title', 'description', 'duration', 'course')
 
 class UserType(DjangoObjectType):
     class Meta:
@@ -37,7 +35,6 @@ class CourseType(DjangoObjectType):
         convert_choices_to_enum = False
 
     def resolve_chapters(self, info):
-        print("--- Chapters Resolver is running! ---") # Add this
         return self.chapters.filter(is_deleted=False)
     
     def resolve_duration(self, info):
@@ -147,69 +144,94 @@ class ApplyCourse(graphene.Mutation):
         except Exception as e:
             raise GraphQLError(str(e))
 
-class CreateChapter(graphene.Mutation):
-    class Arguments:
-        course_id = graphene.Int(required=True)
-        title = graphene.String(required = True)
-        duration = graphene.String(required=True)
-        description = graphene.String()
 
-    success = graphene.Boolean()
-    chapter = graphene.Field(CourseChapterType)
+class CreateCourse(graphene.Mutation):
+    class Arguments:
+        course_name = graphene.String(required=True)
+        level = graphene.String(required=True)
+        teacher_id = graphene.UUID(required = True)
+        duration = graphene.Int(required=True)
+
+    course = graphene.Field(CourseType)
+    
+    def mutate(self, info, course_name, level, teacher_id, duration=30):
+        teacher_instance = None
+        try:
+            teacher_instance = Teacher.objects.get(unique_id=teacher_id)
+        except ObjectDoesNotExist:
+            raise Exception(f"Error: A teacher with the ID {teacher_id} was not found.")
+        
+        duration_obj = datetime.timedelta(days=duration)
+        new_course = Course.objects.create(
+            course_name = course_name,
+            level = level,
+            teacher = teacher_instance,
+            duration = duration_obj
+        )
+        return CreateCourse(course = new_course)
+
+class UpdateCourse(graphene.Mutation):
+    class Arguments:
+        course_id = graphene.Int()
+        course_name = graphene.String()
+        level = graphene.String()
+        teacher_id = graphene.UUID()
+        duration = graphene.Int()
+    
+    course = graphene.Field(CourseType)
+
 
     def mutate(self, info, course_id, **kwargs):
-        course_instance = None
         try:
             course_instance = Course.objects.get(pk=course_id)
-            course_chapter = CourseChapter.objects.create(course = course_instance, **kwargs)
-            return CreateChapter(success = True, chapter = course_chapter)
+        except:
+            raise Exception("Course not found with the provided ID.")
         
-        except Course.DoesNotExist:
-            raise Exception(f"Course with the id {course_id} does not exist.")
+        course_instance.course_name = kwargs.get("course_name")
+        course_instance.level = kwargs.get("level")
+        course_instance.duration = datetime.timedelta(days = kwargs.get("duration"))
+        teacher_id = kwargs.get("teacher_id")
+        if teacher_id is not None:
+            try:
+                teacher_instance = Teacher.objects.get(unique_id = teacher_id) 
+                course_instance.teacher = teacher_instance
+            except ObjectDoesNotExist:
+                raise Exception(f"Teacher with ID {teacher_id} not found.")
+            
+        course_instance.save(
+            update_fields=[
+                "course_name",
+                "teacher",
+                "level",
+                "duration"
 
+            ]
+        )
+        return UpdateCourse(course=course_instance)
 
-class UpdateChapter(graphene.Mutation):
+class DeleteCourse(graphene.Mutation):
     class Arguments:
-        id = graphene.Int(required=True)
-        title = graphene.String()
-        description = graphene.String()
-
-    chapter = graphene.Field(CourseChapterType)  
-    success = graphene.Boolean()
-
-    def mutate(self, info, id, **kwargs):
-        try:
-            chapter = CourseChapter.objects.get(pk=id)
-            for key,value in kwargs.items():
-                setattr(chapter, key, value)
-            chapter.save(update_fields=kwargs.keys())
-
-            return UpdateChapter(chapter = chapter, success = True)
-        except CourseChapter.DoesNotExist:
-            raise Exception(f"Course with id {id} does not exists.")
-
-class DeleteChapter(graphene.Mutation):
-    class Arguments:
-        id = graphene.Int(required=True)
+        id = graphene.Int()
     
-    success = graphene.Boolean()
-    message = graphene.String()
+    ok = graphene.Boolean()
 
     def mutate(self, info, id):
         try:
-            chapter = CourseChapter.objects.get(pk = id)
-            chapter.is_deleted = True
-            chapter.save(update_fields=['is_deleted'])
-            return DeleteChapter(success = True, message=f"Id {id} {chapter.title} is deleted successfully.")
+            item = Course.objects.get(pk = id)
         
-        except CourseChapter.DoesNotExist:
-            raise Exception(f"Chapter with the id {id} does not exist.")
+        except Course.DoesNotExist:
+            raise Exception(f"Course the ID {id} does not exist.")
+        
+        item.is_deleted = True
+        item.save(update_fields = ["is_deleted"])
+        return DeleteCourse(ok = True)
 
-
+    
 class Mutation(graphene.ObjectType):
     apply_course = ApplyCourse.Field()
-    create_chapter = CreateChapter.Field()
-    update_chapter = UpdateChapter.Field()
-    delete_chapter = DeleteChapter.Field()
+    add_course = CreateCourse.Field()
+    update_course = UpdateCourse.Field()
+    delete_course = DeleteCourse.Field()
+
         
 list_course_schema = graphene.Schema(query=Query, mutation=Mutation)
