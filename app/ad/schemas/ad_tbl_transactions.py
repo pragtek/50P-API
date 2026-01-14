@@ -86,15 +86,21 @@ class UpdateTransaction(graphene.Mutation):
     
     transaction = graphene.Field(TokenTransactionsType)
 
-    def mutate(self, info, id, **kwargs):
+    def mutate(self, info, id, module_code = None, status = None, tokens = None):
         try:
             item = TokenTransactions.objects.get(pk = id)
         except TokenTransactions.DoesNotExist:
             raise ValidationError("Transaction does not exists.")
         
-        item.module_code = kwargs.get("module_code")
-        item.status = kwargs.get("status")
-        item.tokens = kwargs.get("tokens")
+        if module_code is not None:
+            item.module_code = module_code
+        
+        if status is not None:
+            item.status = status
+        
+        if tokens is not None:
+            item.tokens = tokens
+
         item.save(
             update_fields = [
             "module_code",
@@ -153,7 +159,5 @@ class Mutation(graphene.ObjectType):
     update_transaction = UpdateTransaction.Field()
     delete_transaction = DeleteTransaction.Field()
     do_transaction = DoTransaction.Field()
-
-
 
 transactions_schema = graphene.Schema(query = Query, mutation = Mutation)
