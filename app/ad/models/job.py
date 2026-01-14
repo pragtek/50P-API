@@ -9,7 +9,7 @@ class Job(BaseModelV2):
         ('part-time', 'Part-Time'),
     ]
     job_id = models.AutoField(primary_key=True)
-    job_title = models.CharField(max_length=255)
+    job_title = models.CharField(max_length=255, db_index=True)
     description = models.TextField()
     qualification = models.TextField()
     location = models.CharField(max_length=255)
@@ -23,6 +23,9 @@ class Job(BaseModelV2):
     category = models.CharField(max_length=100)
     experience = models.CharField(max_length=100)
     applicants = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='applied_jobs')
+    address = models.TextField()
+    latitude = models.CharField(max_length=15, blank=True, null=True)
+    longitude = models.CharField(max_length=15, blank=True, null=True)
 
     class Meta:
         db_table = "tbl_jobs"

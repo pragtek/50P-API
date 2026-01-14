@@ -17,6 +17,9 @@ class JobType(DjangoObjectType):
             "employment_type",
             "category",
             "experience",
+            "address",
+            "latitude",
+            "longitude",
         )
 
 class JobDataModelType(graphene.ObjectType):
@@ -45,7 +48,7 @@ class Query(graphene.ObjectType):
         if search:
             filter = (Q(job_title__icontains=search) | Q(description__icontains=search) | Q(location__icontains=search) | Q(category__icontains=search))
 
-        all_items = Job.objects.filter(filter).order_by("-created_date")
+        all_items = Job.objects.filter(filter, is_deleted=False).order_by("-created_date")
         total_count = all_items.count()
 
         if skip:
@@ -72,6 +75,9 @@ class CreateJob(graphene.Mutation):
         employment_type = graphene.String(required=True)
         category = graphene.String(required=True)
         experience = graphene.String(required=True)
+        address = graphene.String(required=True)
+        latitude = graphene.String(required=True)
+        longitude = graphene.String(required=True)
 
     job = graphene.Field(JobType)
     
@@ -85,6 +91,9 @@ class CreateJob(graphene.Mutation):
             employment_type=kwargs.get("employment_type"),
             category=kwargs.get("category"),
             experience=kwargs.get("experience"),
+            address=kwargs.get("address"),
+            latitude=kwargs.get("latitude"),
+            longitude=kwargs.get("longitude"),
         )
         return CreateJob(job=job)
     
@@ -99,6 +108,9 @@ class UpdateJob(graphene.Mutation):
         employment_type = graphene.String()
         category = graphene.String()
         experience = graphene.String()
+        address = graphene.String()
+        latitude = graphene.String()
+        longitude = graphene.String()
 
     job = graphene.Field(JobType)
 
@@ -115,6 +127,9 @@ class UpdateJob(graphene.Mutation):
         job.employment_type = kwargs.get("employment_type", job.employment_type)
         job.category = kwargs.get("category", job.category)
         job.experience = kwargs.get("experience", job.experience)
+        job.address = kwargs.get("address", job.address)
+        job.latitude = kwargs.get("latitude", job.latitude)
+        job.longitude = kwargs.get("longitude", job.longitude)
         job.save(
             update_fields=[
                 "job_title",
@@ -125,6 +140,9 @@ class UpdateJob(graphene.Mutation):
                 "employment_type",
                 "category",
                 "experience",
+                "address",
+                "latitude",
+                "longitude",
             ]
         )
         return UpdateJob(job=job)
