@@ -64,7 +64,7 @@ class CreateContent(graphene.Mutation):
         content = graphene.String(required=True)
 
     site_content = graphene.Field(SiteContentType)
-    sucuess = graphene.Boolean()
+    success = graphene.Boolean()
     
     def mutate(self, info, title, content):
         try:
@@ -75,7 +75,7 @@ class CreateContent(graphene.Mutation):
         except Exception as e:
             raise GraphQLError(f"Error creating content: {str(e)}") 
         
-        return CreateContent(site_content=site_content, sucuess=True)
+        return CreateContent(site_content=site_content, success=True)
     
 class UpdateContent(graphene.Mutation):
     class Arguments:
@@ -84,7 +84,7 @@ class UpdateContent(graphene.Mutation):
         content = graphene.String()
 
     site_content = graphene.Field(SiteContentType)
-    sucess = graphene.Boolean()
+    success = graphene.Boolean()
 
     def mutate(self, info, id, title = None, content = None):
         try:
@@ -100,7 +100,7 @@ class UpdateContent(graphene.Mutation):
 
         site_content.save()
 
-        return UpdateContent(site_content=site_content, sucess=True)
+        return UpdateContent(site_content=site_content, success=True)
     
 
 class DeleteContent(graphene.Mutation):
