@@ -66,7 +66,6 @@ import ad.schemas.referral as referral
 import ad.schemas.chat_keywords as chat_keywords
 import ad.schemas.clinic as clinic
 import ad.schemas.ad_tbl_transactions as transactions
-import ad.schemas.courses as courses
 import ad.schemas.teachers as teachers
 import ad.schemas.Subscription as subscription
 import ad.schemas.job as job
@@ -84,7 +83,6 @@ class Query(
             job_list.job_list_schema.Query,
             job.job_schema.Query,
             subscription.subscription_schema.Query,
-            courses.courses_schema.Query,
             teachers.teachers_schema.Query,
             transactions.transactions_schema.Query,
             entity_type.schema_entity_type.Query,
@@ -157,7 +155,6 @@ class Mutation(
                 job_list.job_list_schema.Mutation,
                 subscription.subscription_schema.Mutation,
                 job.job_schema.Mutation,
-                courses.courses_schema.Mutation,
                 teachers.teachers_schema.Mutation,
                 transactions.transactions_schema.Mutation,
                 calendar.schema_calendar.Mutation,
