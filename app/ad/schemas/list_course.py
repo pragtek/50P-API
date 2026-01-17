@@ -149,7 +149,7 @@ class CreateCourse(graphene.Mutation):
     class Arguments:
         course_name = graphene.String(required=True)
         level = graphene.String(required=True)
-        teacher_id = graphene.UUID(required = True)
+        teacher_id = graphene.Int(required = True)
         duration = graphene.Int(required=True)
 
     course = graphene.Field(CourseType)
@@ -157,7 +157,7 @@ class CreateCourse(graphene.Mutation):
     def mutate(self, info, course_name, level, teacher_id, duration=30):
         teacher_instance = None
         try:
-            teacher_instance = Teacher.objects.get(unique_id=teacher_id)
+            teacher_instance = Teacher.objects.get(pk=teacher_id)
         except ObjectDoesNotExist:
             raise Exception(f"Error: A teacher with the ID {teacher_id} was not found.")
         
