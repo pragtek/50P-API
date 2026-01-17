@@ -34,5 +34,5 @@ from .Subscription import Subscription
 from .job import Job
 from .test_job import TestJob
 from .site_content import SiteContent
-from .course_chapter import CourseChapter
+from .test_course_chapters import CourseChapter
 
